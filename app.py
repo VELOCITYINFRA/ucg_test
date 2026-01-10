@@ -3,7 +3,7 @@ import json
 import requests
 
 
-runner = UCGEngine(UGC_GRAPH_1, TOOLS)
+)
 
 st.set_page_config(page_title="UGC Kernel", layout="wide")
 
