@@ -2,130 +2,149 @@ import streamlit as st
 import json
 import requests
 
+# ── Configuration ───────────────────────────────────────
+st.set_page_config(page_title="UGC Kernel | Debug Console", layout="wide", initial_sidebar_state="expanded")
 
-st.set_page_config(page_title="UGC Kernel", layout="wide")
-
-# ── Styling ─────────────────────────────────────────────
+# ── Advanced Styling ────────────────────────────────────
 st.markdown("""
 <style>
-body { background-color: #0f1117; color: #e6e6e6; }
-.stButton>button {
-    background-color: #5b7cfa;
-    color: white;
-    border-radius: 10px;
-    height: 48px;
-    font-size: 16px;
-    font-weight: bold;
-}
-.block {
-    background: #151923;
-    padding: 18px;
-    border-radius: 12px;
-    border: 1px solid #2a2f45;
-}
-.kernel {
-    background: #0b0d14;
-    padding: 14px;
-    border-radius: 10px;
-    border: 1px solid #3a3f5a;
-}
-.op {
-    color: #7aa2ff;
-    font-weight: bold;
-}
+    /* Main background and fonts */
+    .stApp { background-color: #0E1117; }
+    
+    /* Modern Glass Cards */
+    .block-container { padding-top: 2rem; }
+    .st-emotion-cache-12w0qpk { padding: 1.5rem; border-radius: 15px; border: 1px solid #30363d; background: #161b22; }
+    
+    /* Execution Trace Styling */
+    .trace-card {
+        background: #0d1117;
+        border-left: 4px solid #58a6ff;
+        padding: 10px 15px;
+        margin: 5px 0;
+        border-radius: 4px;
+        font-family: 'Source Code Pro', monospace;
+    }
+    .op-tag { color: #58a6ff; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; }
+    
+    /* Custom Header */
+    .main-header {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: -webkit-linear-gradient(#58a6ff, #2ea043);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Header ──────────────────────────────────────────────
-st.markdown("## 🧬 UGC Execution Kernel")
-st.markdown("""
-This interface is a **human debug console** for a machine-to-machine execution engine.  
-In production, **AI agents, DAOs, bots, and backend services** call UGC directly.
-""")
+# ── Sidebar Info ────────────────────────────────────────
+with st.sidebar:
+    st.markdown("### 🛠️ Developer Resources")
+    st.info("**UGC Kernel** is a machine-to-machine engine. This UI serves as a human-readable bridge.")
+    
+    st.markdown("---")
+    st.caption("TEST ADDRESSES")
+    st.code("0xA34A13e95CE...949eb", language="text")
+    st.caption("ETH Testnet")
+    st.code("75BgVvMNZ8Es...YWP F", language="text")
+    st.caption("Solana Testnet")
+    
+    st.markdown("---")
+    st.warning("⚠️ **Mode:** Balance Inquiries Only (Infura/Helius)")
 
-st.text("Use this  Ethereum  test Address: 0xA34A13e95CE831953e598689e864a97B7DE949eb")
-st.text("Use this Solana test Address: 75BgVvMNZ8Es1JffEDNYxWNVE2yoBTndLxViARhYWPF")
-st.success("infuraapi and heliusapi  actions are currently are set to balance enquiries only ")
-st.divider()
+# ── Header ──────────────────────────────────────────────
+st.markdown('<p class="main-header">🧬 UGC Execution Kernel</p>', unsafe_allow_html=True)
+st.markdown("---")
 
 # ── Layout ──────────────────────────────────────────────
-left, right = st.columns([1, 1.4])
+col1, col2 = st.columns([1, 1.2], gap="large")
 
-# ── Left: Agent Request ─────────────────────────────────
-with left:
-    st.markdown("### 🤖 Agent Call", unsafe_allow_html=True)
-    st.markdown('<div class="block">', unsafe_allow_html=True)
+with col1:
+    st.subheader("🤖 Agent Request")
+    
+    with st.container(border=True):
+        operation = st.selectbox(
+            "Kernel Operation Type",
+            ["InfuraRPC", "HeliusAPI", "EthereumSigner", "SolanaSigner", "EthereumPayment", "SolanaPayment"],
+            help="Select the DAG entry point for the execution engine."
+        )
+        
+        address = st.text_input("Source Address", placeholder="0x... or Base58...")
+        
+        # Dynamic Fields with Expanders to save vertical space
+        to = amount = payload = None
+        
+        if "Payment" in operation:
+            st.markdown("---")
+            to = st.text_input("Destination Address")
+            amount = st.number_input("Amount", min_value=0.0, format="%.4f")
+            
+        if "Signer" in operation:
+            st.markdown("---")
+            payload = st.text_area("Hex Payload", placeholder="0x48656c6c6f...")
 
-    operation = st.selectbox(
-        "Kernel Operation",
-        ["InfuraRPC", "HeliusAPI", "EthereumSigner", "SolanaSigner", "EthereumPayment", "SolanaPayment"]
-    )
+        st.markdown(" ")
+        run = st.button("⚡ EXECUTE KERNEL", use_container_width=True, type="primary")
 
-    address = st.text_input("Source Address")
-
-    to = amount = payload = None
-
-    if "Payment" in operation:
-        to = st.text_input("Destination Address")
-        amount = st.text_input("Amount")
-
-    if "Signer" in operation:
-        payload = st.text_input("Payload")
-
-    run = st.button("⚡ Execute Kernel")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ── Right: Kernel View ──────────────────────────────────
-with right:
-    st.markdown("### 🧠 Kernel State (What an AI Agent Sees)")
-
-    state = {}
-    if address: state["address"] = address
-    if to: state["to"] = to
-    if amount: state["amount"] = amount
-    if payload: state["payload"] = payload
-
-    st.json(state if state else {"kernel": "waiting for agent input"})
+with col2:
+    st.subheader("🧠 Live Kernel State")
+    
+    # Building State Object
+    state = {k: v for k, v in {"address": address, "to": to, "amount": amount, "payload": payload}.items() if v}
+    
+    # Visualizing the State
+    with st.container(border=True):
+        if not state:
+            st.secondary_告知("Kernel Idle: Waiting for agent input parameters...")
+        else:
+            st.json(state)
 
     if run:
-        st.divider()
-        st.markdown("### ⚙️ Execution Trace")
-
+        st.subheader("⚙️ Execution Trace")
+        
         try:
-            with st.spinner("UGC Kernel executing DAG…"):
-                result =requests.post(
+            with st.status("Initializing UGC DAG...", expanded=True) as status:
+                st.write("Encoding request for machine-layer...")
+                
+                response = requests.post(
                     "https://itsvelocity-ucg-v1.hf.space/ucg",
-                    json={"operation":operation,"state":state}
-                    )
-                jsonresult=result.json()
-                st.write(jsonresult)
-
-            executed_ops_raw = jsonresult.get("executed", "")
-            #Convert string set to list safely
-            executed_ops = [op.strip().strip("'") for op in executed_ops_raw.strip("{}").split(",") if op]
-            st.markdown("### ⚙️ Execution Trace (Op-by-Op)")
-            for op in executed_ops:
-                st.markdown(f'<div class="kernel"><span class="op">{op}</span> executed</div>', unsafe_allow_html=True)
-
-            st.success("Kernel execution finished")
-
-# ── Blockchain Transaction (if exists) ───────────────
-            response_state = jsonresult.get("response", {})
-            if "tx_hash" in response_state:
-                st.markdown("### 🔗 Blockchain Transaction")
-                st.code(response_state["tx_hash"])
+                    json={"operation": operation, "state": state},
+                    timeout=15
+                )
+                
+                if response.status_code == 200:
+                    json_res = response.json()
+                    status.update(label="Kernel Execution Complete", state="complete", expanded=False)
+                    
+                    # Process Operations
+                    executed_ops_raw = json_res.get("executed", "")
+                    ops = [op.strip().strip("'") for op in executed_ops_raw.strip("{}").split(",") if op]
+                    
+                    # Display Ops in a timeline-like fashion
+                    for op in ops:
+                        st.markdown(f"""
+                            <div class="trace-card">
+                                <span class="op-tag">Executed</span><br>
+                                <code>{op}</code>
+                            </div>
+                        """, unsafe_allow_html=True)
+                    
+                    # Blockchain link
+                    resp_data = json_res.get("response", {})
+                    if "tx_hash" in resp_data:
+                        st.success(f"**Transaction Confirmed:** `{resp_data['tx_hash']}`")
+                    
+                    # Show Raw Output in an expander
+                    with st.expander("View Raw Response"):
+                        st.write(json_res)
+                else:
+                    status.update(label="Execution Failed", state="error")
+                    st.error(f"Kernel returned error: {response.status_code}")
 
         except Exception as e:
-            st.error("error")
-
-        # ── Final Machine State ───────────────────────────────
-        #st.markdown("### 📦 Final Machine State")
-        #st.json(response_state)
+            st.error(f"Kernel Connection Error: {str(e)}")
 
 # ── Footer ──────────────────────────────────────────────
 st.divider()
-st.caption("""
-UGC is a deterministic execution graph.  
-This UI is only a **human inspection layer** over the same engine used by autonomous agents.
-""")
+st.caption("UGC Kernel v1.0.4-stable | Deterministic Execution Graph Active")
