@@ -1,44 +1,184 @@
 import streamlit as st
 import requests
+import json
+import time
 
-# ── Configuration ───────────────────────────────────────
-st.set_page_config(page_title="UGC Kernel | Prompt Bridge", layout="wide")
+# ── Configuration & Page Setup ──────────────────────────
+st.set_page_config(
+    page_title="UGC KERNEL | PROMPT BRIDGE",
+    page_icon="🧬",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-# ── Styling ────────────────────────────────────────────
+# ── Million Dollar Styling (Custom CSS) ──────────────────
 st.markdown("""
 <style>
-    .stApp { background-color: #0E1117; color: #C9D1D9; }
-    .main-header { font-size: 2rem; font-weight: 800; background: -webkit-linear-gradient(#58a6ff, #2ea043); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
-    .response-card { background: #161b22; border-left: 4px solid #58a6ff; padding: 10px 15px; margin: 10px 0; border-radius: 6px; font-family: monospace; }
+    /* Global Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;500&display=swap');
+    
+    .stApp {
+        background: radial-gradient(circle at 50% 50%, #1a1f2e 0%, #0a0c10 100%);
+        color: #E6EDF3;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Header Styling */
+    .main-header {
+        font-size: 3.5rem;
+        font-weight: 800;
+        letter-spacing: -2px;
+        background: linear-gradient(90deg, #58a6ff, #bc85ff, #2ea043);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 5s linear infinite;
+        margin-bottom: 0.5rem;
+    }
+    
+    @keyframes shine {
+        to { background-position: 200% center; }
+    }
+
+    .subtitle {
+        color: #8b949e;
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+        font-weight: 400;
+    }
+
+    /* Input Area Styling */
+    .stTextArea textarea {
+        background-color: rgba(22, 27, 34, 0.5) !important;
+        border: 1px solid #30363d !important;
+        border-radius: 12px !important;
+        color: #c9d1d9 !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        backdrop-filter: blur(10px);
+    }
+    
+    .stTextArea textarea:focus {
+        border-color: #58a6ff !important;
+        box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3) !important;
+    }
+
+    /* Button Styling */
+    .stButton>button {
+        width: 100%;
+        background: linear-gradient(45deg, #238636, #2ea043) !important;
+        border: none !important;
+        color: white !important;
+        font-weight: 700 !important;
+        padding: 0.75rem !important;
+        border-radius: 10px !important;
+        transition: all 0.3s ease !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(46, 160, 67, 0.4);
+    }
+
+    /* Response Card */
+    .response-container {
+        background: rgba(22, 27, 34, 0.8);
+        border: 1px solid #30363d;
+        border-radius: 16px;
+        padding: 24px;
+        margin-top: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .status-tag {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(88, 166, 255, 0.1);
+        color: #58a6ff;
+        border: 1px solid rgba(88, 166, 255, 0.2);
+        margin-bottom: 1rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-header">🧬 UGC Prompt Bridge</p>', unsafe_allow_html=True)
+# ── Header ─────────────────────────────────────────────
+st.markdown('<h1 class="main-header">UGC KERNEL</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Next-gen bridge for prompt-driven kernel execution.</p>', unsafe_allow_html=True)
 
-# ── User Prompt Input ──────────────────────────────────
-prompt = st.text_area("Enter your request for the UGC kernel:", placeholder="e.g., Get balance of 0x449555", height=100)
+# ── Layout ─────────────────────────────────────────────
+col1, col2 = st.columns([2, 1])
 
-if st.button("⚡ EXECUTE", type="primary") and prompt.strip():
-    st.subheader("⚙️ Execution Trace")
+with col1:
+    prompt = st.text_area(
+        "SYSTEM PROMPT", 
+        placeholder="e.g., Query liquidity for pool 0x... or Execute cross-chain swap", 
+        height=180,
+        label_visibility="collapsed"
+    )
+    
+    btn_col1, btn_col2 = st.columns([1, 2])
+    with btn_col1:
+        execute = st.button("⚡ RUN KERNEL")
+
+with col2:
+    st.info("💡 **Quick Tips**\n\n- Use `0x` addresses for wallet queries.\n- Specify token symbols (ETH, USDC) for swaps.\n- Kernel v1.2 supports Layer 2 queries.")
+
+# ── Execution Logic ────────────────────────────────────
+if execute and prompt.strip():
+    st.divider()
+    
+    # Visual Progress
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    
     try:
-        with st.spinner("Sending prompt to UGC kernel..."):
-            # Safe API call to UGC backend
-            response = requests.post(
-                "https://itsvelocity-ucg-v1.hf.space/ucg",
-                json={"prompt": prompt},  # we just send the prompt
-                timeout=15
-            )
+        status_text.text("Connecting to UGC Node...")
+        progress_bar.progress(30)
         
+        # Actual API Call
+        response = requests.post(
+            "https://itsvelocity-ucg-v1.hf.space/ucg",
+            json={"prompt": prompt},
+            timeout=15
+        )
+        
+        progress_bar.progress(100)
+        status_text.text("Execution Complete.")
+        time.sleep(0.5)
+        status_text.empty()
+        progress_bar.empty()
+
         if response.status_code == 200:
             json_res = response.json()
+            output = json_res.get("response", json_res)
             
-            # Display raw response safely
-            st.markdown('<div class="response-card">', unsafe_allow_html=True)
-            st.text(json_res.get("response", json_res))
-            st.markdown('</div>', unsafe_allow_html=True)
+            # Display Results in a Professional Card
+            st.markdown(f"""
+                <div class="response-container">
+                    <span class="status-tag">🟢 SUCCESS: KERNEL_ID_{int(time.time())}</span>
+                    <h3 style="margin-top:0;">Output Trace</h3>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Pretty print JSON or Text
+            st.code(output, language="json" if isinstance(output, (dict, list)) else "markdown")
+            
         else:
-            st.error(f"UGC kernel returned error {response.status_code}")
-    
+            st.error(f"Kernel Error: {response.status_code}")
+            st.toast("Execution Failed", icon="❌")
+            
     except Exception as e:
-        st.error(f"Connection Error: {str(e)}")
+        st.error(f"Connection Timeout: {str(e)}")
+        st.toast("Network Error", icon="⚠️")
+
+# ── Footer ─────────────────────────────────────────────
+st.markdown("""
+<div style="text-align: center; margin-top: 5rem; color: #484f58; font-size: 0.8rem;">
+    UGC Kernel Infrastructure • Powered by Velocity • © 2024
+</div>
+""", unsafe_allow_html=True)
 
