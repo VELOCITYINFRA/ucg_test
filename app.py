@@ -3,8 +3,6 @@ import json
 import requests
 
 
-)
-
 st.set_page_config(page_title="UGC Kernel", layout="wide")
 
 # ── Styling ─────────────────────────────────────────────
