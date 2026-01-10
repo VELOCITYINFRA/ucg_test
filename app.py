@@ -39,9 +39,7 @@ body { background-color: #0f1117; color: #e6e6e6; }
 # ── Header ──────────────────────────────────────────────
 st.markdown("## 🧬 UGC Execution Kernel")
 st.markdown("""
-**This is NOT a wallet.**  
 This interface is a **human debug console** for a machine-to-machine execution engine.  
-
 In production, **AI agents, DAOs, bots, and backend services** call UGC directly.
 """)
 
