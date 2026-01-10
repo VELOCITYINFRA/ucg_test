@@ -96,7 +96,7 @@ with col2:
     # Visualizing the State
     with st.container(border=True):
         if not state:
-            st.secondary_告知("Kernel Idle: Waiting for agent input parameters...")
+            st.secondary"Kernel Idle: Waiting for agent input parameters...")
         else:
             st.json(state)
 
