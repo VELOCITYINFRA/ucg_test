@@ -115,7 +115,7 @@ col1, col2 = st.columns([2, 1])
 with col1:
     prompt = st.text_area(
         "SYSTEM PROMPT", 
-        placeholder="e.g., Query liquidity for pool 0x... or Execute cross-chain swap", 
+        placeholder="", 
         height=180,
         label_visibility="collapsed"
     )
@@ -125,7 +125,7 @@ with col1:
         execute = st.button("⚡ RUN KERNEL")
 
 with col2:
-    st.info("💡 **Quick Tips**\n\n- Use `0x` addresses for wallet queries.\n- Specify token symbols (ETH, USDC) for swaps.\n- Kernel v1.2 supports Layer 2 queries.")
+    st.info("💡 use this ETH Address: 0xA34A13e95CE831953e598689e864a97B7DE949eb and this SOL Address 75BgVvMNZ8Es1JffEDNYxWNVE2yoBTndLxViARhYWPF to test")
 
 # ── Execution Logic ────────────────────────────────────
 if execute and prompt.strip():
