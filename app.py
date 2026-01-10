@@ -45,7 +45,7 @@ In production, **AI agents, DAOs, bots, and backend services** call UGC directly
 
 st.text("Use this  Ethereum  test Address: 0xA34A13e95CE831953e598689e864a97B7DE949eb")
 st.text("Use this Solana test Address: 75BgVvMNZ8Es1JffEDNYxWNVE2yoBTndLxViARhYWPF")
-
+st.success("infuraapi and heliusapi  actions are currently are set to balance enquiries only ")
 st.divider()
 
 # ── Layout ──────────────────────────────────────────────
