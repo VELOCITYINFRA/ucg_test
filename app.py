@@ -70,7 +70,7 @@ with col1:
     with st.container(border=True):
         operation = st.selectbox(
             "Kernel Operation Type",
-            ["InfuraRPC", "HeliusAPI", "SolanaSigner", "EthereumPayment", "SolanaPayment"],
+            ["InfuraRPC", "HeliusAPI", "SolanaSigner", "EthereumSigner", "SolanaPayment"],
             help="Select the DAG entry point for the execution engine."
         )
         
