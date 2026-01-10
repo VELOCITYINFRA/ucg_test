@@ -100,7 +100,7 @@ with col2:
     if address: state["address"] = address
     if "Payment" in operation:
         if to: state["to"] = to
-        if amount: state["amount"] = amount
+        if amount: state["amount"] = str(amount)
     if "Signer" in operation:
         if payload: state["payload"] = payload  
 
