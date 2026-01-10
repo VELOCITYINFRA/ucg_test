@@ -44,11 +44,11 @@ with st.sidebar:
     st.info("**UGC Kernel** is a machine-to-machine engine. This UI serves as a human-readable bridge.")
     
     st.markdown("---")
-    st.caption("TEST ADDRESSES")
+    st.write("TEST ADDRESSES")
     st.code("0xA34A13e95CE...949eb", language="text")
-    st.caption("ETH Testnet")
+    st.write("ETH Testnet")
     st.code("75BgVvMNZ8Es...YWP F", language="text")
-    st.caption("Solana Testnet")
+    st.write("Solana Testnet")
     
     st.markdown("---")
     st.warning("⚠️ **Mode:** Balance Inquiries Only (Infura/Helius)")
