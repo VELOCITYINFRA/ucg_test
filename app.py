@@ -86,7 +86,7 @@ with col1:
             
         if "Signer" in operation:
             st.markdown("---")
-            payload = st.text_area("Hex Payload", placeholder="0x48656c6c6f...")
+            payload = st.text_area( "Payload", placeholder="message to sign")
 
         st.markdown(" ")
         run = st.button("⚡ EXECUTE KERNEL", use_container_width=True, type="primary")
