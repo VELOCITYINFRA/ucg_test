@@ -95,8 +95,16 @@ with col2:
     st.subheader("🧠 Live Kernel State")
     
     # Building State Object
-    state = {k: v for k, v in {"address": address, "to": to, "amount": amount, "payload": payload}.items() if v}
-    
+  
+    state = {}
+    if address: state["address"] = address
+    if "Payment" in operation:
+        if to: state["to"] = to
+        if amount: state["amount"] = amount
+    if "Signer" in operation:
+        if payload: state["payload"] = payload  
+
+
     # Visualizing the State
     with st.container(border=True):
         if not state:
