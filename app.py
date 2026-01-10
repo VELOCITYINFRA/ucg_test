@@ -45,10 +45,14 @@ with st.sidebar:
     
     st.markdown("---")
     st.write("TEST ADDRESSES")
-    st.code("0xA34A13e95CE...949eb", language="text")
+    
     st.write("ETH Testnet")
-    st.code("75BgVvMNZ8Es...YWP F", language="text")
+    st.code("0xA34A13e95CE831953e598689e864a97B7DE949eb", language="text")
+
+
     st.write("Solana Testnet")
+    st.code("75BgVvMNZ8Es1JffEDNYxWNVE2yoBTndLxViARhYWPF", language="text")
+    
     
     st.markdown("---")
     st.warning("⚠️ **Mode:** Balance Inquiries Only (Infura/Helius)")
