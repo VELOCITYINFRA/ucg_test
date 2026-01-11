@@ -5,7 +5,7 @@ import time
 
 # ── Configuration & Page Setup ──────────────────────────
 st.set_page_config(
-    page_title="UGC KERNEL | PROMPT BRIDGE",
+    page_title="UCG KERNEL | PROMPT BRIDGE",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="collapsed"
