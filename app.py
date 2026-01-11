@@ -106,7 +106,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Header ─────────────────────────────────────────────
-st.markdown('<h1 class="main-header">UGC KERNEL</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">UCG KERNEL</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Next-gen bridge for prompt-driven kernel execution.</p>', unsafe_allow_html=True)
 
 
