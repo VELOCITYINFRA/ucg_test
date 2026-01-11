@@ -109,6 +109,22 @@ st.markdown("""
 st.markdown('<h1 class="main-header">UGC KERNEL</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Next-gen bridge for prompt-driven kernel execution.</p>', unsafe_allow_html=True)
 
+
+st.markdown('''
+
+
+![supported ops domaims]
+> Balance Check ETH ,Balance Check SOL  , EthereumSigner ,SolanaSigner,SolanaPayment
+
+
+```yaml
+ Examples : get balance of <address here> , sign this payload <payload here> using <address here> , transfer <amount> from <address> to <destination address> [ devnet]
+ As is evident , no need to infer the network , token or any explicit details , ALL is handled , detetced and orchestrated by UCG Layer 
+
+```
+
+''')
+
 # ── Layout ─────────────────────────────────────────────
 col1, col2 = st.columns([2, 1])
 
